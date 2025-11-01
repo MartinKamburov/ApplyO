@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "ApplyO",
+    "version": "1.0.0",
+    "icons": {
+        "32": "applyoicon.png",
+        "48": "applyoicon.png",
+        "128": "applyoicon.png"
+    },
+    "action": {
+        "default_popup": "index.html"
+    },
+    "permissions": [
+        "scripting"
+    ],
+    "host_permissions": [
+        "http://*/*",
+        "https://*/*"
+    ],
+    "description": "Applyo is a lightweight browser extension and web dashboard that helps you stay organized throughout your job hunt. Capture job listings instantly all in one clean, modern interface."
+    
+}
