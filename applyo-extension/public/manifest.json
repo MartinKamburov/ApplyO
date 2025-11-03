@@ -17,6 +17,7 @@
         "http://*/*",
         "https://*/*"
     ],
+    
     "description": "Applyo is a lightweight browser extension and web dashboard that helps you stay organized throughout your job hunt. Capture job listings instantly all in one clean, modern interface."
     
 }
