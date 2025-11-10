@@ -18,7 +18,7 @@ export default async function UserDashboard() {
 
   return (
     <div>
-      Hello you are not signed in
+        Hello
     </div>
   )
 }
