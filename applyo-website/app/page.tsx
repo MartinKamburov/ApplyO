@@ -2,29 +2,22 @@
 
 import { auth } from "@/auth";
 import SignInButton from "@/components/login-button";
-import SignOutButton from "@/components/signOut-button";
-
+import { redirect } from 'next/navigation';
 
 export default async function Home() {
   const session = await auth();
-  console.log(session);
 
-  if (session?.user) {
-    return (
-      <div>
-        {" "}
-        <h1>Hello you are signed in!</h1>
-        <p> User signed in with name: {session.user.name} </p>
-        <p> User signed in with name: {session.user.email} </p>
-        <SignOutButton />
-      </div>
-    )
+  if (session){
+    redirect('/user-dashboard')
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <p> You are not signed in! </p>
-      <SignInButton />
+    <div className="grid grid-flow-col grid-rows-3 gap-4">
+      <div className="row-span-3">
+        <p> You are not signed in! </p>
+        <br/>
+        <SignInButton />
+      </div>
     </div>
   );
 }
