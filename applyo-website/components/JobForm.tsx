@@ -1,21 +1,45 @@
-import { insertUserJobs } from "@/lib/database/InsertToDatabase";
+"use client"
+
+// Can't directly use a server only function into a client component since next.js can't serialize it
+// import { insertUserJobs } from "@/lib/database/InsertToDatabase";
 
 export default function JobForm() {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const formData = new FormData(event.currentTarget);
+        const form = event.currentTarget as HTMLFormElement; // <- grab it synchronously
+        const formData = new FormData(form);
 
         const jobData = {
-        company: formData.get("company") as string,
-        job_title: formData.get("job_title") as string,
-        location: formData.get("location") as string,
-        listing_url: formData.get("listing_url") as string,
-        description: formData.get("description") as string,
+            company: formData.get("company") as string,
+            job_title: formData.get("job_title") as string,
+            location: formData.get("location") as string,
+            listing_url: formData.get("listing_url") as string,
+            description: formData.get("description") as string,
         };
 
-        await insertUserJobs(jobData); // ✅ pass the values to your function
+        try {
+            const res = await fetch("/api/jobs/insert", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(jobData),
+            });
+
+            if (!res.ok){
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err?.message ?? `HTTP ${res.status}`);
+            }
+
+            const inserted = await res.json();
+            console.log("Inserted job: ", inserted);
+            // how to reset the form
+            form.reset();
+            alert("Job added!");
+        } catch (err: any) {
+            console.error("Failed to add job", err);
+            alert("Failed to add job — check console.");
+        } 
     };
 
     return (
