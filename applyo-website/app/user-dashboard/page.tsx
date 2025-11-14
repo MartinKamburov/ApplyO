@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import JobForm from "@/components/JobForm";
 import SignOutButton from "@/components/signOut-button";
-
+import DisplayUserJobs from "@/components/DisplayUserJobs";
 
 export default async function UserDashboard() {
   const session = await auth();
@@ -20,6 +20,11 @@ export default async function UserDashboard() {
 
 
         <JobForm />
+        <br/>
+
+        <DisplayUserJobs />
+
+        <br/>
 
         <SignOutButton />
     </div>
