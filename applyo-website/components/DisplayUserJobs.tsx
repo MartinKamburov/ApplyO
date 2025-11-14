@@ -1,9 +1,20 @@
 "use client"
 import { useState, useEffect } from "react";
+import Modal from "./Modal";
 
+type Job = {
+    email?: string;
+    company: string;
+    job_title: string;
+    location?: string | null;
+    listing_url?: string | null;
+    description?: string | null;
+    created_at?: string | null;
+}
 
 export default function DisplayUserJobs() {
-    const [userJobData, setUserJobData] = useState([]);
+    const [descriptionButton, setOpenDescriptionButton] = useState(false);
+    const [userJobData, setUserJobData] = useState<Job[]>([]);
 
     const getUserJobData = async () => {
         try {
@@ -30,70 +41,65 @@ export default function DisplayUserJobs() {
     }, []);
 
     return (
-        <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default">
+        <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default p-2">
             <table className="w-full text-sm text-left rtl:text-right text-body">
                 <thead className="text-sm text-body bg-neutral-secondary-medium border-b border-default-medium">
                 <tr>
                     <th scope="col" className="px-6 py-3 font-medium">
-                    Product name
+                    Company
                     </th>
                     <th scope="col" className="px-6 py-3 font-medium">
-                    Color
+                    Location
                     </th>
                     <th scope="col" className="px-6 py-3 font-medium">
-                    Category
+                    Job Title
                     </th>
                     <th scope="col" className="px-6 py-3 font-medium">
-                    Price
+                    Link
                     </th>
                     <th scope="col" className="px-6 py-3 font-medium">
-                    Action
+                    Description
+                    </th>
+                    <th scope="col" className="px-6 py-3 font-medium">
+                    Change Info
                     </th>
                 </tr>
                 </thead>
 
                 <tbody>
-                <tr className="bg-neutral-primary-soft border-b border-default">
-                    <th scope="row" className="px-6 py-4 font-medium text-heading whitespace-nowrap">
-                    Apple MacBook Pro 17"
-                    </th>
-                    <td className="px-6 py-4">Silver</td>
-                    <td className="px-6 py-4">Laptop</td>
-                    <td className="px-6 py-4">$2999</td>
-                    <td className="px-6 py-4">
-                    <a href="#" className="font-medium text-fg-brand hover:underline">
-                        Edit
-                    </a>
-                    </td>
-                </tr>
+                    {userJobData.length === 0 ? (
+                        <tr>
+                        <td colSpan={5} className="px-6 py-4 text-center text-body">
+                            No jobs found
+                        </td>
+                        </tr>
+                    ) : (
+                        userJobData.map((job) => (
+                            <tr key={job.email} className="bg-neutral-primary-soft border-b border-default">
+                                <th scope="row" className="px-6 py-4 font-medium text-heading whitespace-nowrap">
+                                {job.company}
+                                </th>
 
-                <tr className="bg-neutral-primary-soft border-b border-default">
-                    <th scope="row" className="px-6 py-4 font-medium text-heading whitespace-nowrap">
-                    Microsoft Surface Pro
-                    </th>
-                    <td className="px-6 py-4">White</td>
-                    <td className="px-6 py-4">Laptop PC</td>
-                    <td className="px-6 py-4">$1999</td>
-                    <td className="px-6 py-4">
-                    <a href="#" className="font-medium text-fg-brand hover:underline">
-                        Edit
-                    </a>
-                    </td>
-                </tr>
+                                <td className="px-6 py-4">{job.job_title}</td>
+                                <td className="px-6 py-4">{job.location ?? "—"}</td>
+                                <td className="px-6 py-4">{job.listing_url ? <a href={job.listing_url} className="text-fg-brand hover:underline">Link</a> : "—"}</td>
+                                {/* <td className="px-6 py-4">{job.description}</td> */}
+                                <td className="px-6 py-4">
+                                    <button onClick={() => setOpenDescriptionButton(true)}>Open modal</button>
+                                    <Modal
+                                        isModalOpen={descriptionButton}
+                                        setIsModalOpen={setOpenDescriptionButton}
+                                        title="Edit item"
+                                        ContentComponent={() => <div>{job.description}</div>}
+                                    />
+                                </td>
 
-                <tr className="bg-neutral-primary-soft">
-                    <th scope="row" className="px-6 py-4 font-medium text-heading whitespace-nowrap">
-                    Magic Mouse 2
-                    </th>
-                    <td className="px-6 py-4">Black</td>
-                    <td className="px-6 py-4">Accessories</td>
-                    <td className="px-6 py-4">$99</td>
-                    <td className="px-6 py-4">
-                    <a href="#" className="font-medium text-fg-brand hover:underline">
-                        Edit
-                    </a>
-                    </td>
-                </tr>
+                                <td className="px-6 py-4">
+                                    <button className="font-medium text-fg-brand hover:underline">Edit</button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
         </div>
