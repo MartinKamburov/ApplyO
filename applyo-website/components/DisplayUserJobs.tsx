@@ -16,6 +16,7 @@ export default function DisplayUserJobs() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [userJobData, setUserJobData] = useState<Job[]>([]);
+    
 
     const getUserJobData = async () => {
         try {
@@ -33,6 +34,32 @@ export default function DisplayUserJobs() {
             setUserJobData(response.data);
         } catch (err: any) {
             console.error("Failed to fetch the jobs", err);
+        } 
+    };
+
+    const deleteUserJobData = async (job: Job) => {
+        try {
+            const res = await fetch("/api/jobs/delete", {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(job)
+            });
+
+            if (!res.ok){
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err?.message ?? `HTTP ${res.status}`);
+            }
+
+            const response = await res.json();
+
+            console.log(response);
+
+            // refresh the page by calling the getUserJobData function again
+            getUserJobData();
+        } catch (err: any) {
+            console.error("Failed to delete the job", err);
         } 
     };
 
@@ -66,7 +93,7 @@ export default function DisplayUserJobs() {
                     Description
                     </th>
                     <th scope="col" className="px-6 py-3 font-medium">
-                    Change Info
+                    Delete job
                     </th>
                 </tr>
                 </thead>
@@ -87,7 +114,7 @@ export default function DisplayUserJobs() {
 
                                 <td className="px-6 py-4">{job.job_title}</td>
                                 <td className="px-6 py-4">{job.location ?? "—"}</td>
-                                <td className="px-6 py-4">{job.listing_url ? <a href={job.listing_url} className="text-fg-brand hover:underline">Link</a> : "—"}</td>
+                                <td className="px-6 py-4">{job.listing_url ? <a href={job.listing_url} className="text-fg-brand hover:underline">Visit</a> : "—"}</td>
                                 {/* <td className="px-6 py-4">{job.description}</td> */}
                                 <td className="px-6 py-4">
                                     <button
@@ -99,8 +126,11 @@ export default function DisplayUserJobs() {
                                 </td>
 
                                 <td className="px-6 py-4">
-                                    <button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                                        Edit
+                                    <button 
+                                        onClick={() => deleteUserJobData(job)}
+                                        className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+                                    >
+                                        Delete 
                                     </button>
                                 </td>
                             </tr>

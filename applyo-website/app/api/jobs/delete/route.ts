@@ -15,21 +15,19 @@ export async function DELETE(req: Request){
         const dataInput = { 
             ...body,
             email: session.user.email 
-        }
-
-        
+        };
 
         const { data, error } = await supabaseConnection
             .from("user_job_data")
-            .insert(dataInput)
+            .delete()
+            .match({ id: dataInput.id, email: session.user.email })
             .select()
-
 
         if (error) throw error;
 
-        return NextResponse.json(data, { status: 201 });
+        return NextResponse.json(data, { status: 200 });
     } catch (err: any) {
-        console.error("API /api/jobs/insert error:", err);
+        console.error("API /api/jobs/delete error:", err);
         return NextResponse.json({ message: err?.message ?? "Server error" }, { status: 500 });
     }
 
