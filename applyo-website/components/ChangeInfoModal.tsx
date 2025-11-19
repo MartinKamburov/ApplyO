@@ -34,7 +34,7 @@ const Modal = ({ isModalOpen, setIsModalOpen, title, children }: ModalProps) => 
           leaveTo="opacity-0"
         >
           {/* dark, opaque overlay */}
-          <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
+          <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
         </TransitionChild>
 
         <div className="relative z-[10000] w-full max-w-3xl">

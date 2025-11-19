@@ -16,6 +16,7 @@ export async function DELETE(req: Request){
             ...body,
             email: session.user.email 
         }
+
         
 
         const { data, error } = await supabaseConnection

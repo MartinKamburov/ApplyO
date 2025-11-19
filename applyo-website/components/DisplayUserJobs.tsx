@@ -13,7 +13,8 @@ type Job = {
 }
 
 export default function DisplayUserJobs() {
-    const [descriptionButton, setOpenDescriptionButton] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [userJobData, setUserJobData] = useState<Job[]>([]);
 
     const getUserJobData = async () => {
@@ -28,7 +29,6 @@ export default function DisplayUserJobs() {
             }
 
             const response = await res.json();
-            // console.log("Here is the get requests response: ", response);
 
             setUserJobData(response.data);
         } catch (err: any) {
@@ -39,6 +39,11 @@ export default function DisplayUserJobs() {
     useEffect(() => {
         getUserJobData();
     }, []);
+
+    const openDescription = (job: Job) => {
+        setSelectedJob(job);
+        setIsModalOpen(true);
+    };
 
     return (
         <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default p-2">
@@ -85,23 +90,36 @@ export default function DisplayUserJobs() {
                                 <td className="px-6 py-4">{job.listing_url ? <a href={job.listing_url} className="text-fg-brand hover:underline">Link</a> : "—"}</td>
                                 {/* <td className="px-6 py-4">{job.description}</td> */}
                                 <td className="px-6 py-4">
-                                    <button onClick={() => setOpenDescriptionButton(true)}>Open modal</button>
-                                    <Modal
-                                        isModalOpen={descriptionButton}
-                                        setIsModalOpen={setOpenDescriptionButton}
-                                        title="Edit item"
-                                        ContentComponent={() => <div>{job.description}</div>}
-                                    />
+                                    <button
+                                        onClick={() => openDescription(job)}
+                                        className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+                                    >
+                                        Open to view
+                                    </button>
                                 </td>
 
                                 <td className="px-6 py-4">
-                                    <button className="font-medium text-fg-brand hover:underline">Edit</button>
+                                    <button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                                        Edit
+                                    </button>
                                 </td>
                             </tr>
                         ))
                     )}
                 </tbody>
             </table>
+
+            {/* single modal instance */}
+            <Modal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} title="Description">
+                <div>
+                    {selectedJob?.description ? (
+                        // preserve formatting if long
+                        <div className="whitespace-pre-wrap">{selectedJob.description}</div>
+                    ) : (
+                        <div className="text-sm text-muted">No description available.</div>
+                    )}
+                </div>
+            </Modal>
         </div>
 
     );
