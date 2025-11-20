@@ -11,7 +11,7 @@
         "default_popup": "index.html"
     },
     "permissions": [
-        "scripting"
+        "scripting", "storage", "activeTab", "tabs", "identity"
     ],
     "host_permissions": [
         "http://*/*",

@@ -1,8 +1,20 @@
-
+/// <reference types="chrome" />
 
 function App() {
 
+  const clickMe = async () => {
+    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id! },
+      func: () => {
+        alert("Hello from my extension!")
+      }
+    })
+  }
+
   return (
+    
+
     <form className="w-[380px] rounded-2xl bg-gradient-to-b from-white/90 to-white/70 backdrop-blur-xl shadow-xl p-6 border border-white/30">
       <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Add Job</h2>
 
@@ -79,6 +91,8 @@ function App() {
       <div className="flex justify-between items-center">
         <button
           type="submit"
+          onClick={clickMe}
+
           className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg py-2.5 transition duration-200 shadow-md"
         >
           Save Application
