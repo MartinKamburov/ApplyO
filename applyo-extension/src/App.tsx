@@ -13,19 +13,63 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const AUTH_URL = import.meta.env.VITE_AUTH_URL;
 
+// Initial state for the form data
+const INITIAL_FORM_STATE = {
+  company: '',
+  location: '',
+  title: '',
+  link: '',
+  description: '',
+};
+
+// Define the type for form data
+type FormData = typeof INITIAL_FORM_STATE;
+
 function App() {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
+  // State to control the form inputs
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_STATE);
+
+  // Function to update the formData state on every input change
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   // 1. On load, check if we have a token saved in Chrome Storage
   useEffect(() => {
-    chrome.storage.local.get(["supabase_token"], (result) => {
+    chrome.storage.local.get(["supabase_token", "saved_form_data"], (result) => {
       if (result.supabase_token) {
         setToken(result.supabase_token as string);
       }
+
+      // Load and restore saved form data if available
+      if (result.saved_form_data && typeof result.saved_form_data === 'object') {
+        setFormData(result.saved_form_data as FormData);
+      }
     });
   }, []);
+
+  // --- PERSISTENCE: Save form data to storage whenever it changes ---
+  useEffect(() => {
+    // Only save if the form is actually visible and populated
+    const hasData = Object.values(formData).some(val => val !== '');
+    
+    if (token && hasData) {
+      // Debounce the save operation to avoid excessive writes
+      const delayDebounceFn = setTimeout(() => {
+        chrome.storage.local.set({ saved_form_data: formData });
+      }, 500); 
+
+      return () => clearTimeout(delayDebounceFn);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData, token]);
 
   // 2. Handle Login Redirect
   const handleLogin = () => {
@@ -69,7 +113,9 @@ function App() {
   // 3. Handle Logout
   const handleLogout = () => {
     chrome.storage.local.remove("supabase_token");
+    chrome.storage.local.remove("saved_form_data");
     setToken(null);
+    setFormData(INITIAL_FORM_STATE);
     setStatusMsg("");
   };
 
@@ -98,29 +144,20 @@ function App() {
       if (!userEmail) {
         throw new Error("Could not extract email from token. Please sign out and in again.");
       }
-
-      // --- STEP B: Collect Form Data ---
-      const formData = new FormData(e.currentTarget);
       
-      // Map form fields to your specific Supabase columns
+      // --- STEP B: Prepare Data (Using State Data) ---
       const jobData = {
-        email: userEmail,           // Extracted from token
-        company: formData.get("company"),
-        location: formData.get("location"),
-        job_title: formData.get("title"),     // DB: job_title, Form: title
-        listing_url: formData.get("link"),    // DB: listing_url, Form: link
-        description: formData.get("description"),
+        email: userEmail,           
+        company: formData.company,
+        location: formData.location,
+        job_title: formData.title,     
+        listing_url: formData.link,    
+        description: formData.description,
       };
 
-      // --- STEP C: Initialize Supabase Client ---
-      // We create a new client specifically for this request to ensure
-      // the Authorization header is set correctly with the user's token.
+      // --- STEP C & D: Initialize Client and Insert Data ---
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        global: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        global: { headers: { Authorization: `Bearer ${token}` } },
       });
 
       // --- STEP D: Insert Data ---
@@ -137,7 +174,10 @@ function App() {
 
       setStatusMsg("Saved successfully!");
       // Optional: Clear the form (uncomment if desired)
-      e.currentTarget.reset(); 
+      // FIX: Clear the form by reliably resetting the state
+      setFormData(INITIAL_FORM_STATE); 
+      // Clear the saved draft from storage
+      chrome.storage.local.remove("saved_form_data");
 
     } catch (err: any) {
       console.error("Save Error:", err);
@@ -213,6 +253,8 @@ function App() {
           required
           type="text"
           placeholder="e.g. Google"
+          value={formData.company}
+          onChange={handleChange}
           className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
         />
       </div>
@@ -227,6 +269,8 @@ function App() {
           name="location"
           type="text"
           placeholder="e.g. Remote / Toronto"
+          value={formData.location}
+          onChange={handleChange}
           className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
         />
       </div>
@@ -242,6 +286,8 @@ function App() {
           required
           type="text"
           placeholder="e.g. Frontend Engineer"
+          value={formData.title}
+          onChange={handleChange}
           className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
         />
       </div>
@@ -256,6 +302,8 @@ function App() {
           name="link"
           type="url"
           placeholder="https://..."
+          value={formData.link}
+          onChange={handleChange}
           className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
         />
       </div>
@@ -270,6 +318,8 @@ function App() {
           name="description"
           rows={2}
           placeholder="Key details..."
+          value={formData.description}
+          onChange={handleChange}
           className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none"
         />
       </div>
