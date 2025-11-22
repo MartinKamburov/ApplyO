@@ -137,7 +137,7 @@ function App() {
 
       setStatusMsg("Saved successfully!");
       // Optional: Clear the form (uncomment if desired)
-      // e.currentTarget.reset(); 
+      e.currentTarget.reset(); 
 
     } catch (err: any) {
       console.error("Save Error:", err);
@@ -153,7 +153,7 @@ function App() {
   if (!token) {
     return (
       <div className="w-[380px] h-[400px] flex flex-col items-center justify-center bg-white p-6 border border-gray-200 rounded-xl shadow-xl font-sans">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Job Tracker</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Applyo Job Tracker</h2>
         <p className="text-gray-500 mb-6 text-center px-4">
           Sign in to save job applications directly to your dashboard.
         </p>

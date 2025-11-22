@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   if (!session || !session.user) {
     // Construct the callback URL to return to THIS route after login
     const callbackUrl = encodeURIComponent(`${process.env.NEXTAUTH_URL}/api/auth/extension?ext_id=${extensionId}`);
-    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/auth/signin?callbackUrl=${callbackUrl}`);
+    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/api/auth/signin?callbackUrl=${callbackUrl}`);
   }
 
   // 4. Generate a Supabase-compatible JWT
@@ -41,10 +41,9 @@ export async function GET(request: Request) {
   // the user should already exist in the 'auth.users' or 'public.users' table.
   // We create a token that claims to be this user.
   const payload = {
-    aud: "authenticated",      // Audience (Supabase auth)
-    role: "authenticated",     // Role (matches RLS policies)
     sub: session.user.id,      // The User ID (Ensure your auth.ts callbacks expose user.id!)
     email: session.user.email, 
+    role: "authenticated",     // Role (matches RLS policies)
     exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7), // Expires in 7 days
   };
 
