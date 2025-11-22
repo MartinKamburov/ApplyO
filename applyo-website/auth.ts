@@ -18,5 +18,22 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         url: SUPABASE_URL,
         secret: SUPABASE_ANON_KEY,
     }),
-
+    callbacks: {
+        // 1. When the user logs in, the 'user' object (from Supabase) is passed here.
+        // We save the user.id into the JWT token.
+        async jwt({ token, user }) {
+        if (user) {
+            token.id = user.id; 
+        }
+        return token;
+        },
+        // 2. When the client/server checks the session, they get the token.
+        // We copy the ID from the token into the session object.
+        async session({ session, token }) {
+        if (session.user && token.id) {
+            session.user.id = token.id as string;
+        }
+        return session;
+        },
+    },
 })

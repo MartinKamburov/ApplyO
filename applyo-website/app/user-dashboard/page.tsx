@@ -11,6 +11,8 @@ export default async function UserDashboard() {
   // If the user isn't signed in return blank
   if (!session?.user) return [];
 
+  console.log(session);
+
   return (
     <div>
         {" "}
