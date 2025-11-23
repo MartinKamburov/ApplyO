@@ -33,11 +33,15 @@ export default function Hero() {
 
             {/* Heading */}
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              Simply Track Your Jobs!
+              Tracking Your Jobs Made Simple!
             </h1>
 
             {/* Subtext */}
-            <p className="mt-6 text-lg leading-8 text-gray-600">
+            <p className="mt-6 text-lg leading-8 text-gray-600 text-xl font-bold">
+              Losing track of multiple jobs that you have applied to?
+            </p>
+
+            <p className="text-lg leading-8 text-gray-600">
               Applyo is a lightweight browser extension and web dashboard that helps you stay organized throughout your job hunt. Capture job listings instantly with an all in one clean, modern interface.
             </p>
 
@@ -47,10 +51,10 @@ export default function Hero() {
                 href="#"
                 className="rounded-md bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
               >
-                Documentation
+                Add to Chrome
               </a>
               <a
-                href="#"
+                href="https://github.com/MartinKamburov/ApplyO"
                 className="flex items-center text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600 transition-colors"
               >
                 View on GitHub <span aria-hidden="true" className="ml-2">→</span>
@@ -111,9 +115,6 @@ export default function Hero() {
                   </code>
                   <code className="block pl-12">
                     &lt;<span className="text-yellow-200">Switch</span> checked={"{enabled}"} onChange={"{setEnabled}"} name="notifications"&gt;
-                  </code>
-                  <code className="block pl-16 text-gray-500">
-                    {/* ... */}
                   </code>
                   <code className="block pl-12">
                     &lt;/<span className="text-yellow-200">Switch</span>&gt;

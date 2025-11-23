@@ -24,7 +24,7 @@ const Footer = () => {
         <div className="flex flex-col items-center justify-center w-full space-y-8">
           
           {/* 1. Logo & Brand Name */}
-          <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+          {/* <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
             <Image
               src={logo}
               alt="Applyo logo"
@@ -35,7 +35,7 @@ const Footer = () => {
             <span className="text-xl font-bold tracking-tight text-gray-900">
               Applyo
             </span>
-          </Link>
+          </Link> */}
 
           {/* 2. Navigation Links (Horizontal Row) */}
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4">

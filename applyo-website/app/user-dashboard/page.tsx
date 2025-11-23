@@ -2,8 +2,8 @@
 
 import { auth } from "@/auth";
 import JobForm from "@/components/JobForm";
-import SignOutButton from "@/components/signOut-button";
 import DisplayUserJobs from "@/components/DisplayUserJobs";
+import DashboardHeader from "@/components/DashboardHeader";
 
 export default async function UserDashboard() {
   const session = await auth();
@@ -15,20 +15,13 @@ export default async function UserDashboard() {
 
   return (
     <div>
-        {" "}
-        <h1>Hello you are signed in!</h1>
-        <p> User signed in with name: {session.user.name} </p>
-        <p> User signed in with name: {session.user.email} </p>
-
-
-        <JobForm />
+        <DashboardHeader />
         <br/>
-
         <DisplayUserJobs />
 
         <br/>
-
-        <SignOutButton />
+        <JobForm />
+        <br/>
     </div>
   )
 }
