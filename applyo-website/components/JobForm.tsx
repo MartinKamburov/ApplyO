@@ -1,14 +1,15 @@
 "use client"
-
-// Can't directly use a server only function into a client component since next.js can't serialize it
-// import { insertUserJobs } from "@/lib/database/InsertToDatabase";
+import { useState } from "react";
 
 export default function JobForm() {
+    // Add loading state for better UX
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setIsLoading(true); // Start loading
 
-        const form = event.currentTarget as HTMLFormElement; // <- grab it synchronously
+        const form = event.currentTarget as HTMLFormElement;
         const formData = new FormData(form);
 
         const jobData = {
@@ -31,107 +32,125 @@ export default function JobForm() {
                 throw new Error(err?.message ?? `HTTP ${res.status}`);
             }
 
-            const inserted = await res.json();
-            console.log("Inserted job: ", inserted);
-            // how to reset the form
+            // Optional: You might want to trigger a refresh of the job list here
+            // e.g., router.refresh() or a callback prop passed to this component
+            
             form.reset();
-            alert("Job added!");
+            // You might want to replace alert with a toast notification later
+            alert("Job added successfully!");
         } catch (err: any) {
             console.error("Failed to add job", err);
             alert("Failed to add job — check console.");
-        } 
+        } finally {
+            setIsLoading(false); // Stop loading
+        }
     };
 
     return (
-        <form 
-            onSubmit={handleSubmit}
-            className="w-[380px] rounded-2xl bg-gradient-to-b from-white/90 to-white/70 backdrop-blur-xl shadow-xl p-6 border border-white/30"
-        >
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Add Job</h2>
+        <div className="w-full max-w-[380px]">
+            {/* Header */}
+            <h2 className="text-2xl font-bold text-slate-800 mb-6 text-center">Add Job</h2>
 
-            {/* Company Field */}
-            <div className="mb-5">
-                <label htmlFor="company" className="block text-sm font-medium text-gray-600 mb-1">
-                Company
-                </label>
-                <input
-                id="company"
-                name="company"
-                type="text"
-                required
-                placeholder="Enter here..."
-                className="w-full rounded-lg border border-gray-300 bg-white/70 py-2 px-3 text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 outline-none transition duration-200"
-                />
-            </div>
+            <form 
+                onSubmit={handleSubmit}
+                className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-6 sm:p-8"
+            >
+                <div className="space-y-5">
+                    {/* Company Field */}
+                    <div>
+                        <label htmlFor="company" className="block text-sm font-semibold text-slate-600 mb-1.5">
+                            Company
+                        </label>
+                        <input
+                            id="company"
+                            name="company"
+                            type="text"
+                            required
+                            placeholder="Enter here..."
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 outline-none"
+                        />
+                    </div>
 
-            {/* Company Field */}
-            <div className="mb-5">
-                <label htmlFor="location" className="block text-sm font-medium text-gray-600 mb-1">
-                Location
-                </label>
-                <input
-                id="location"
-                name="location"
-                type="text"
-                required
-                placeholder="Enter here..."
-                className="w-full rounded-lg border border-gray-300 bg-white/70 py-2 px-3 text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 outline-none transition duration-200"
-                />
-            </div>
+                    {/* Location Field */}
+                    <div>
+                        <label htmlFor="location" className="block text-sm font-semibold text-slate-600 mb-1.5">
+                            Location
+                        </label>
+                        <input
+                            id="location"
+                            name="location"
+                            type="text"
+                            required
+                            placeholder="e.g. Remote / Toronto"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 outline-none"
+                        />
+                    </div>
 
-            {/* Job Title Field */}
-            <div className="mb-5">
-                <label htmlFor="title" className="block text-sm font-medium text-gray-600 mb-1">
-                Job Title
-                </label>
-                <input
-                id="job_title"
-                name="job_title"
-                type="text"
-                required
-                placeholder="e.g. Software Engineer"
-                className="w-full rounded-lg border border-gray-300 bg-white/70 py-2 px-3 text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 outline-none transition duration-200"
-                />
-            </div>
+                    {/* Job Title Field */}
+                    <div>
+                        <label htmlFor="job_title" className="block text-sm font-semibold text-slate-600 mb-1.5">
+                            Job Title
+                        </label>
+                        <input
+                            id="job_title"
+                            name="job_title"
+                            type="text"
+                            required
+                            placeholder="e.g. Software Engineer"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 outline-none"
+                        />
+                    </div>
 
-            {/* Link Field */}
-            <div className="mb-6">
-                <label htmlFor="link" className="block text-sm font-medium text-gray-600 mb-1">
-                Link
-                </label>
-                <input
-                id="listing_url"
-                name="listing_url"
-                type="url"
-                required
-                placeholder="Paste job link..."
-                className="w-full rounded-lg border border-gray-300 bg-white/70 py-2 px-3 text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 outline-none transition duration-200"
-                />
-            </div>
+                    {/* Link Field */}
+                    <div>
+                        <label htmlFor="listing_url" className="block text-sm font-semibold text-slate-600 mb-1.5">
+                            Link
+                        </label>
+                        <input
+                            id="listing_url"
+                            name="listing_url"
+                            type="url"
+                            required
+                            placeholder="Paste job link..."
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 outline-none"
+                        />
+                    </div>
 
-            <div className="mb-6">
-                <label htmlFor="description" className="block text-sm font-medium text-gray-600 mb-1">
-                Description
-                </label>
-                <input
-                id="description"
-                name="description"
-                type="text"
-                required
-                placeholder="Paste the jobs description..."
-                className="w-full rounded-lg border border-gray-300 bg-white/70 py-2 px-3 text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 outline-none transition duration-200"
-                />
-            </div>
+                    {/* Description Field */}
+                    <div>
+                        <label htmlFor="description" className="block text-sm font-semibold text-slate-600 mb-1.5">
+                            Description
+                        </label>
+                        <input // You might want to change this to a <textarea> if descriptions are long
+                            id="description"
+                            name="description"
+                            type="text"
+                            required
+                            placeholder="Short description..."
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 outline-none"
+                        />
+                    </div>
 
-            {/* Buttons */}
-            <div className="flex justify-between items-center">
-                <button
-                type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg py-2.5 transition duration-200 shadow-md"
-                >
-                Save Application
-                </button>
-            </div>
-        </form>
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full mt-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/30 focus:outline-none focus:ring-4 focus:ring-blue-600/20 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200"
+                    >
+                        {isLoading ? (
+                            <span className="flex items-center justify-center gap-2">
+                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                                Saving...
+                            </span>
+                        ) : (
+                            "Save Application"
+                        )}
+                    </button>
+                </div>
+            </form>
+        </div>
     )
 }

@@ -43,7 +43,7 @@ export default function DashboardHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="bg-gray-50">
+    <header className="bg-white">
       <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
         <div className="flex lg:flex-1">
           <a className="-m-1.5 p-1.5">
@@ -67,14 +67,8 @@ export default function DashboardHeader() {
           </button>
         </div>
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-          <a href="#" className="text-sm/6 font-semibold text-black">
-            Features
-          </a>
-          <a href="#" className="text-sm/6 font-semibold text-black">
-            Marketplace
-          </a>
-          <a href="#" className="text-sm/6 font-semibold text-black">
-            Company
+          <a href="#" className="text-xl font-semibold text-black">
+            Welcome to your job dashboard!
           </a>
         </PopoverGroup>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
@@ -112,19 +106,7 @@ export default function DashboardHeader() {
                   href="#"
                   className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-black hover:bg-white/5"
                 >
-                  Features
-                </a>
-                <a
-                  href="#"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-black hover:bg-white/5"
-                >
-                  Marketplace
-                </a>
-                <a
-                  href="#"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-black hover:bg-white/5"
-                >
-                  Company
+                  Welcome to your job dashboard!
                 </a>
               </div>
               <div className="py-6">
