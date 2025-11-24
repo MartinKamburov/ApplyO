@@ -3,15 +3,11 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 // --- CONFIGURATION ---
-// These should be in your .env file in the extension root
-// Example .env content:
-// VITE_SUPABASE_URL=https://your-project.supabase.co
-// VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsIn...
-// VITE_AUTH_URL=http://localhost:3000/api/auth/extension
-
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const AUTH_URL = import.meta.env.VITE_AUTH_URL;
+const DASHBOARD_URL = "http://localhost:3000/user-dashboard";
+const WEBSITE_URL = "http://localhost:3000";  
 
 // Initial state for the form data
 const INITIAL_FORM_STATE = {
@@ -129,8 +125,6 @@ function App() {
 
     try {
       // --- STEP A: Decode Email from Token ---
-      // We need to send the email because your DB requires it, 
-      // but the form doesn't ask the user for it.
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(
@@ -161,8 +155,6 @@ function App() {
       });
 
       // --- STEP D: Insert Data ---
-      // Target the 'user_job_data' table in the 'next_auth' schema
-      // NOTE: We must explicitly state the schema since it's not 'public'
       const { error } = await supabase
         .schema("next_auth") 
         .from("user_job_data")
@@ -174,7 +166,6 @@ function App() {
 
       setStatusMsg("Saved successfully!");
       // Optional: Clear the form (uncomment if desired)
-      // FIX: Clear the form by reliably resetting the state
       setFormData(INITIAL_FORM_STATE); 
       // Clear the saved draft from storage
       chrome.storage.local.remove("saved_form_data");
@@ -192,14 +183,19 @@ function App() {
   // VIEW 1: Logged Out
   if (!token) {
     return (
-      <div className="w-[380px] h-[400px] flex flex-col items-center justify-center bg-white p-6 border border-gray-200 rounded-xl shadow-xl font-sans">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Applyo Job Tracker</h2>
-        <p className="text-gray-500 mb-6 text-center px-4">
-          Sign in to save job applications directly to your dashboard.
+      <div className="w-[380px] h-[400px] flex flex-col items-center justify-center bg-white p-6 border border-slate-200 rounded-xl shadow-lg font-sans">
+        <div className="flex items-center justify-center w-12 h-12 bg-blue-50 rounded-xl mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-blue-600">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Welcome to Applyo</h2>
+        <p className="text-slate-500 mb-8 text-center px-4 text-sm leading-relaxed">
+          Sign in to your account to start tracking your job applications instantly.
         </p>
         
         {statusMsg && (
-          <div className="mb-4 p-2 bg-red-50 text-red-600 text-xs rounded w-full text-center">
+          <div className="mb-4 p-2 bg-red-50 text-red-600 text-xs font-medium rounded w-full text-center border border-red-100">
             {statusMsg}
           </div>
         )}
@@ -207,7 +203,7 @@ function App() {
         <button
           onClick={handleLogin}
           disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg py-3 transition duration-200 shadow-md flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-sm text-white font-semibold rounded-lg py-3 transition duration-200 shadow-md shadow-blue-600/20 flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {loading ? (
             <span className="flex items-center gap-2">
@@ -221,6 +217,15 @@ function App() {
             "Sign in with Website"
           )}
         </button>
+        
+        <a
+          href={WEBSITE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 w-full text-center text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors bg-slate-50 py-3 rounded-lg border border-slate-100 hover:border-blue-100 hover:bg-blue-50"
+        >
+          Go to Website
+        </a>
       </div>
     );
   }
@@ -229,23 +234,23 @@ function App() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[380px] rounded-2xl bg-white shadow-xl p-6 border border-gray-100 font-sans"
+      className="w-[380px] bg-white p-6 border border-slate-200 rounded-xl shadow-lg font-sans"
     >
-      <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
-        <h2 className="text-xl font-bold text-gray-800">Add Application</h2>
+      <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+        <h2 className="text-xl font-bold text-slate-800">New Application</h2>
         <button
           type="button"
           onClick={handleLogout}
-          className="text-xs text-gray-500 hover:text-red-600 hover:underline transition-colors"
+          className="text-xs font-medium text-slate-400 hover:text-red-600 hover:underline transition-colors"
         >
           Sign Out
         </button>
       </div>
 
       {/* Company Field */}
-      <div className="mb-3">
-        <label htmlFor="company" className="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-          Company
+      <div className="mb-4">
+        <label htmlFor="company" className="block text-xs font-bold text-slate-600 mb-1.5">
+          Company Name
         </label>
         <input
           id="company"
@@ -255,13 +260,13 @@ function App() {
           placeholder="e.g. Google"
           value={formData.company}
           onChange={handleChange}
-          className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
         />
       </div>
 
       {/* Location Field */}
-      <div className="mb-3">
-        <label htmlFor="location" className="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
+      <div className="mb-4">
+        <label htmlFor="location" className="block text-xs font-bold text-slate-600 mb-1.5">
           Location
         </label>
         <input
@@ -271,13 +276,13 @@ function App() {
           placeholder="e.g. Remote / Toronto"
           value={formData.location}
           onChange={handleChange}
-          className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
         />
       </div>
 
       {/* Job Title Field */}
-      <div className="mb-3">
-        <label htmlFor="title" className="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
+      <div className="mb-4">
+        <label htmlFor="title" className="block text-xs font-bold text-slate-600 mb-1.5">
           Job Title
         </label>
         <input
@@ -288,14 +293,14 @@ function App() {
           placeholder="e.g. Frontend Engineer"
           value={formData.title}
           onChange={handleChange}
-          className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
         />
       </div>
 
       {/* Link Field */}
-      <div className="mb-3">
-        <label htmlFor="link" className="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-          Link
+      <div className="mb-4">
+        <label htmlFor="link" className="block text-xs font-bold text-slate-600 mb-1.5">
+          Job Link
         </label>
         <input
           id="link"
@@ -304,29 +309,29 @@ function App() {
           placeholder="https://..."
           value={formData.link}
           onChange={handleChange}
-          className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
         />
       </div>
 
       {/* Description Field */}
-      <div className="mb-5">
-        <label htmlFor="description" className="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
+      <div className="mb-6">
+        <label htmlFor="description" className="block text-xs font-bold text-slate-600 mb-1.5">
           Description
         </label>
         <textarea
           id="description"
           name="description"
-          rows={2}
-          placeholder="Key details..."
+          rows={3}
+          placeholder="Key details about the role..."
           value={formData.description}
           onChange={handleChange}
-          className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none"
         />
       </div>
 
       {/* Status Message */}
       {statusMsg && (
-        <div className={`mb-4 text-xs text-center py-2 rounded ${
+        <div className={`mb-4 text-xs font-medium text-center py-2.5 rounded-lg ${
           statusMsg.includes("Error") 
             ? "bg-red-50 text-red-600 border border-red-100" 
             : "bg-green-50 text-green-600 border border-green-100"
@@ -335,14 +340,26 @@ function App() {
         </div>
       )}
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg py-2.5 transition duration-200 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-[0.98]"
-      >
-        {loading ? "Saving..." : "Save Application"}
-      </button>
+      <div className="flex flex-col gap-3">
+        {/* Save Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg py-3 transition duration-200 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-[0.98]"
+        >
+          {loading ? "Saving..." : "Save Application"}
+        </button>
+
+        {/* Go to Dashboard Link */}
+        <a
+          href={DASHBOARD_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full text-center bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold rounded-lg py-2.5 text-xs transition duration-200 border border-blue-100"
+        >
+          Go to Dashboard
+        </a>
+      </div>
     </form>
   );
 }
