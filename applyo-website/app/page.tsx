@@ -15,13 +15,13 @@ export default async function Home() {
   }
 
   return (
-    <div className="grid grid-flow-col grid-rows-3 gap-4 bg-gray-50">
-      <div className="row-span-3">
-        <Header />
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <Header />
+      <main>
         <Hero />
         <FAQ />
-        <Footer /> 
-      </div>
+      </main>
+      <Footer /> 
     </div>
   );
 }

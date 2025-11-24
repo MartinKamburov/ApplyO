@@ -7,8 +7,7 @@ const Footer = () => {
 
   // Navigation Links Data
   const mainLinks = [
-    { name: "Pricing", href: "/#pricing" },
-    { name: "Support", href: "mailto:applyo_support@gmail.com", target: "_blank" },
+    { name: "Support", href: "mailto:martin.kamburov23@gmail.com", target: "_blank" },
   ];
 
   const legalLinks = [

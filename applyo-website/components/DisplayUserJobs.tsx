@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { 
     EyeIcon, 
     TrashIcon, 
@@ -19,30 +19,27 @@ type Job = {
     created_at?: string | null;
 }
 
-export default function DisplayUserJobs() {
+interface DisplayUserJobsProps {
+    refreshTrigger: number;
+}
+
+export default function DisplayUserJobs({ refreshTrigger }: DisplayUserJobsProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [userJobData, setUserJobData] = useState<Job[]>([]);
 
-    const getUserJobData = async () => {
+    const getUserJobData = useCallback(async () => {
         try {
             const res = await fetch("/api/jobs/get", { method: "GET" });
-
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err?.message ?? `HTTP ${res.status}`);
-            }
-
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const response = await res.json();
             setUserJobData(response.data);
         } catch (err: any) {
             console.error("Failed to fetch the jobs", err);
         }
-    };
+    }, []);
 
     const deleteUserJobData = async (job: Job) => {
-        if (!confirm("Are you sure you want to delete this job?")) return;
-
         try {
             const res = await fetch("/api/jobs/delete", {
                 method: "DELETE",
@@ -63,7 +60,7 @@ export default function DisplayUserJobs() {
 
     useEffect(() => {
         getUserJobData();
-    }, []);
+    }, [getUserJobData, refreshTrigger]);
 
     const openDescription = (job: Job) => {
         setSelectedJob(job);

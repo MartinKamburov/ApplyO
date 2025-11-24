@@ -1,7 +1,11 @@
 "use client"
 import { useState } from "react";
 
-export default function JobForm() {
+interface JobFormProps {
+    onJobAdded: () => void;
+}
+
+export default function JobForm({ onJobAdded }: JobFormProps) {
     // Add loading state for better UX
     const [isLoading, setIsLoading] = useState(false);
 
@@ -32,15 +36,11 @@ export default function JobForm() {
                 throw new Error(err?.message ?? `HTTP ${res.status}`);
             }
 
-            // Optional: You might want to trigger a refresh of the job list here
-            // e.g., router.refresh() or a callback prop passed to this component
+            onJobAdded();
             
             form.reset();
-            // You might want to replace alert with a toast notification later
-            alert("Job added successfully!");
         } catch (err: any) {
             console.error("Failed to add job", err);
-            alert("Failed to add job — check console.");
         } finally {
             setIsLoading(false); // Stop loading
         }

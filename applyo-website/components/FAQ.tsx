@@ -11,15 +11,15 @@ type FAQItemData = {
 const faqData: FAQItemData[] = [
   {
     question: "What do I get exactly?",
-    answer: "You get full access to our comprehensive dashboard, the Chrome extension for one-click saving, and unlimited job application tracking. We also include template generators for cover letters.",
+    answer: "You get free access to our comprehensive dashboard, the Chrome extension for one-click saving, and unlimited job application tracking.",
   },
   {
-    question: "Can I get a refund?",
-    answer: "Yes, we offer a 14-day money-back guarantee. If you're not satisfied with Applyo for any reason within the first two weeks, simply contact support for a full refund, no questions asked.",
+    question: "Can I request a feature?",
+    answer: "Yes of course! I would love to improve the job tracker just click on the support button at the bottom and email me!",
   },
   {
     question: "I have another question",
-    answer: "Cool, contact us by email at support@applyo.com and we'll get back to you as soon as possible.",
+    answer: "Cool, contact me by email and I'll get back to you as soon as possible, just click the support button at the bottom.",
   },
 ];
 
@@ -110,7 +110,7 @@ export default function FAQ() {
               Frequently Asked Questions
             </h2>
             <p className="mt-4 text-gray-500">
-              Can’t find the answer you’re looking for? Reach out to our customer support team.
+              Can’t find the answer you’re looking for? Reach out to my email martin.kamburov23@gmail.com.
             </p>
           </div>
 
