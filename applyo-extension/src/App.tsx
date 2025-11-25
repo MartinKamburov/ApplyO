@@ -6,8 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const AUTH_URL = import.meta.env.VITE_AUTH_URL;
-const DASHBOARD_URL = "http://localhost:3000/user-dashboard";
-const WEBSITE_URL = "http://localhost:3000";  
+const DASHBOARD_URL = "https://apply-o.vercel.app/user-dashboard";
+const WEBSITE_URL = "https://apply-o.vercel.app";  
 
 // Initial state for the form data
 const INITIAL_FORM_STATE = {

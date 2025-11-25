@@ -17,6 +17,6 @@
         "http://localhost:3000/*", 
         "https://*.supabase.co/*"
     ],
-    "description": "Applyo is a lightweight browser extension and web dashboard that helps you stay organized throughout your job hunt. Capture job listings instantly all in one clean, modern interface."
+    "description": "Applyo is a free browser extension and web dashboard that helps you stay organized throughout your job hunt!"
     
 }
