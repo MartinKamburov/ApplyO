@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 // --- CONFIGURATION ---
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const AUTH_URL = import.meta.env.VITE_AUTH_URL;
+const SUPABASE_URL = "https://fbwwtuojeoghjvfzoovc.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZid3d0dW9qZW9naGp2Znpvb3ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwNzYzMDcsImV4cCI6MjA3NzY1MjMwN30.MTaBnbhvVJdJ9POSO8Eiw7Mle_tcaPTw0bFX6OQhPAU";
+const AUTH_URL = "https://apply-o.vercel.app/api/auth/extension";
 const DASHBOARD_URL = "https://apply-o.vercel.app/user-dashboard";
 const WEBSITE_URL = "https://apply-o.vercel.app";  
 
