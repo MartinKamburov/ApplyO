@@ -15,7 +15,7 @@
     ],
     "host_permissions": [ 
         "https://*.supabase.co/*",
-        "https://apply-o.vercel.app/*"
+        "https://www.applyo.tech/*"
     ],
     "description": "Applyo is a free browser extension and web dashboard that helps you stay organized throughout your job hunt!"
     
