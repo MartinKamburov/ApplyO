@@ -2,10 +2,11 @@
 
 import { signIn, signOut } from "@/auth";
 
-export const login = async () => {
-    await signIn("github", {redirectTo: "/user-dashboard"});
+// Accepts the provider name ('github' or 'google')
+export const login = async (provider: "github" | "google") => {
+    await signIn(provider, { redirectTo: "/user-dashboard" });
 }
 
 export const logout = async () => {
-    await signOut({redirectTo: "/"});
+    await signOut({ redirectTo: "/" });
 }
