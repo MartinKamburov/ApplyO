@@ -5,7 +5,10 @@ import {
     TrashIcon, 
     MapPinIcon, 
     BuildingOfficeIcon, 
-    ArrowTopRightOnSquareIcon 
+    ArrowTopRightOnSquareIcon,
+    MagnifyingGlassIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon
 } from "@heroicons/react/24/outline";
 import Modal from "./Modal";
 
@@ -23,10 +26,16 @@ interface DisplayUserJobsProps {
     refreshTrigger: number;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export default function DisplayUserJobs({ refreshTrigger }: DisplayUserJobsProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [userJobData, setUserJobData] = useState<Job[]>([]);
+    
+    // Pagination & Search State
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
 
     const getUserJobData = useCallback(async () => {
         try {
@@ -62,26 +71,65 @@ export default function DisplayUserJobs({ refreshTrigger }: DisplayUserJobsProps
         getUserJobData();
     }, [getUserJobData, refreshTrigger]);
 
+    // Reset to page 1 when search query changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
     const openDescription = (job: Job) => {
         setSelectedJob(job);
         setIsModalOpen(true);
     };
 
+    // 1. Filter Data
+    const filteredJobs = userJobData.filter((job) => 
+        job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.job_title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // 2. Calculate Pagination Logic
+    const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
+
+    const handlePrevious = () => {
+        if (currentPage > 1) setCurrentPage(prev => prev - 1);
+    };
+
+    const handleNext = () => {
+        if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+    };
+
     return (
-        // CHANGED: Added max-width, mx-auto, and padding to "squish" it in the middle
         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            {/* Optional Title Section */}
-            <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-slate-800">Your Applications</h2>
-                <span className="text-sm text-slate-500">{userJobData.length} saved</span>
+            {/* Title & Search Section */}
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-800">Your Applications</h2>
+                    <span className="text-sm text-slate-500">{userJobData.length} saved</span>
+                </div>
+
+                {/* Modern Search Bar */}
+                <div className="relative w-full sm:w-72">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <MagnifyingGlassIcon className="h-5 w-5 text-slate-400" aria-hidden="true" />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search companies..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="block w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none shadow-sm transition-all duration-200"
+                    />
+                </div>
             </div>
 
             {/* Card Container */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-slate-600">
-                        {/* Table Header */}
                         <thead className="bg-slate-50 border-b border-slate-200">
                             <tr>
                                 <th scope="col" className="px-6 py-4 font-semibold text-slate-700">Company / Role</th>
@@ -91,20 +139,25 @@ export default function DisplayUserJobs({ refreshTrigger }: DisplayUserJobsProps
                             </tr>
                         </thead>
 
-                        {/* Table Body */}
                         <tbody className="divide-y divide-slate-100">
-                            {userJobData.length === 0 ? (
+                            {/* Handle Empty Search Results vs Empty Database */}
+                            {filteredJobs.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-slate-400">
                                             <BuildingOfficeIcon className="w-12 h-12 mb-3 opacity-20" />
-                                            <p className="text-base font-medium">No jobs saved yet.</p>
-                                            <p className="text-sm">Start adding applications to populate this list.</p>
+                                            <p className="text-base font-medium">
+                                                {searchQuery ? "No matching jobs found." : "No jobs saved yet."}
+                                            </p>
+                                            <p className="text-sm">
+                                                {searchQuery ? "Try a different search term." : "Start adding applications to populate this list."}
+                                            </p>
                                         </div>
                                     </td>
                                 </tr>
                             ) : (
-                                userJobData.map((job, index) => (
+                                // Map over PAGINATED jobs
+                                paginatedJobs.map((job, index) => (
                                     <tr 
                                         key={index} 
                                         className="hover:bg-blue-50/50 transition-colors duration-200 group"
@@ -149,7 +202,6 @@ export default function DisplayUserJobs({ refreshTrigger }: DisplayUserJobsProps
                                         {/* Column 4: Actions (View & Delete) */}
                                         <td className="px-6 py-4 align-middle text-right">
                                             <div className="flex items-center justify-end gap-3">
-                                                {/* View Button */}
                                                 <button
                                                     onClick={() => openDescription(job)}
                                                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-md border border-blue-100 hover:bg-blue-100 hover:border-blue-200 transition-all"
@@ -158,7 +210,6 @@ export default function DisplayUserJobs({ refreshTrigger }: DisplayUserJobsProps
                                                     View
                                                 </button>
 
-                                                {/* Delete Button */}
                                                 <button
                                                     onClick={() => deleteUserJobData(job)}
                                                     className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
@@ -174,6 +225,63 @@ export default function DisplayUserJobs({ refreshTrigger }: DisplayUserJobsProps
                         </tbody>
                     </table>
                 </div>
+
+                {/* ✨ NEW: Pagination Footer */}
+                {filteredJobs.length > ITEMS_PER_PAGE && (
+                    <div className="border-t border-slate-200 bg-slate-50 px-4 py-3 sm:px-6 flex items-center justify-between">
+                        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                            <div>
+                                <p className="text-sm text-slate-700">
+                                    Showing <span className="font-medium">{startIndex + 1}</span> to <span className="font-medium">{Math.min(endIndex, filteredJobs.length)}</span> of <span className="font-medium">{filteredJobs.length}</span> results
+                                </p>
+                            </div>
+                            <div>
+                                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                    <button
+                                        onClick={handlePrevious}
+                                        disabled={currentPage === 1}
+                                        className="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <span className="sr-only">Previous</span>
+                                        <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
+                                    </button>
+                                    
+                                    {/* Page Info */}
+                                    <span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-inset ring-slate-300 focus:outline-offset-0">
+                                        Page {currentPage} of {totalPages}
+                                    </span>
+
+                                    <button
+                                        onClick={handleNext}
+                                        disabled={currentPage === totalPages}
+                                        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <span className="sr-only">Next</span>
+                                        <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
+                                    </button>
+                                </nav>
+                            </div>
+                        </div>
+                        
+                        {/* Mobile View (Simpler) */}
+                        <div className="flex flex-1 justify-between sm:hidden">
+                            <button
+                                onClick={handlePrevious}
+                                disabled={currentPage === 1}
+                                className="relative inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                disabled={currentPage === totalPages}
+                                className="relative ml-3 inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Modal */}
