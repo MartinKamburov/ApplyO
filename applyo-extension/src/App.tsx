@@ -20,6 +20,7 @@ const INITIAL_FORM_STATE = {
 
 // Define the type for form data
 type FormData = typeof INITIAL_FORM_STATE;
+const SESSION_COOKIE_NAME = "__Secure-authjs.session-token";
 
 function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -37,19 +38,33 @@ function App() {
     }));
   };
 
-  // 1. On load, check if we have a token saved in Chrome Storage
+  // 1. On load: Check Token AND Sync with Website Session
   useEffect(() => {
     chrome.storage.local.get(["supabase_token", "saved_form_data"], (result) => {
       if (result.supabase_token) {
-        setToken(result.supabase_token as string);
-      }
-
-      // Load and restore saved form data if available
-      if (result.saved_form_data && typeof result.saved_form_data === 'object') {
-        setFormData(result.saved_form_data as FormData);
+        // FIX: Add 'as string' to tell TypeScript we know it's a string
+        checkWebsiteSession(result.supabase_token as string, result.saved_form_data);
+      } else {
+        setToken(null);
       }
     });
   }, []);
+
+  // New Helper Function to Sync Session
+  const checkWebsiteSession = (storedToken: string, savedData: any) => {
+    chrome.cookies.get({ url: WEBSITE_URL, name: SESSION_COOKIE_NAME }, (cookie) => {
+      // If cookie exists, the user is still logged in on the site
+      if (cookie) {
+        setToken(storedToken);
+        if (savedData) setFormData(savedData);
+      } else {
+        // If cookie is MISSING, the user logged out on the site.
+        // We must sync and log them out here too.
+        console.log("Website session not found. Logging out extension.");
+        handleLogout(); 
+      }
+    });
+  };
 
   // --- PERSISTENCE: Save form data to storage whenever it changes ---
   useEffect(() => {
