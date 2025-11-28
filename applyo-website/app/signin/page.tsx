@@ -1,17 +1,24 @@
 "use client";
 
-import { login } from "@/lib/actions/auth"; // Make sure this path matches your actions file
-import { useState } from "react";
+import { login } from "@/lib/actions/auth"; 
+import { useState, Suspense } from "react"; // 1. Import Suspense
+import { useSearchParams } from "next/navigation"; // 2. Import useSearchParams
 import Image from "next/image";
-import logo from "@/app/applyoicon.png" 
+import logo from "@/app/applyoicon.png";
 
-export default function SignIn() {
+// 3. Create a sub-component for the logic to keep things clean and Suspense-compatible
+function SignInContent() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  
+  // 4. Get the callbackUrl from the URL (e.g. ?callbackUrl=...)
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const handleLogin = async (provider: "google" | "github") => {
     setIsLoading(provider);
     try {
-      await login(provider);
+      // 5. Pass the callbackUrl to your server action
+      await login(provider, callbackUrl);
     } catch (error) {
       console.error("Login failed:", error);
       setIsLoading(null);
@@ -20,11 +27,10 @@ export default function SignIn() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-6 py-12 lg:px-8">
-      
       {/* Logo Section */}
       <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col items-center mb-6">
         <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-600/20">
-           <Image src={logo} alt="ApplyO Logo" width={40} height={40} className="w-10 h-10 rounded" />
+          <Image src={logo} alt="ApplyO Logo" width={40} height={40} className="w-10 h-10 rounded" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-bold leading-9 tracking-tight text-slate-900">
           Welcome back to ApplyO
@@ -114,5 +120,14 @@ export default function SignIn() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 6. Export the Page wrapped in Suspense
+export default function SignIn() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+      <SignInContent />
+    </Suspense>
   );
 }

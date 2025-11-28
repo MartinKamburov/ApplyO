@@ -11,7 +11,7 @@
         "default_popup": "index.html"
     },
     "permissions": [
-        "storage", "activeTab", "identity"
+        "storage", "identity"
     ],
     "host_permissions": [ 
         "https://*.supabase.co/*",
