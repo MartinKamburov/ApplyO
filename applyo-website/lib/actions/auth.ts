@@ -4,7 +4,7 @@ import { signIn, signOut } from "@/auth";
 
 // Accepts the provider name ('github' or 'google')
 export const login = async (provider: "github" | "google", callbackUrl?: string | null) => {
-    await signIn(provider, { redirectTo: callbackUrl || "/dashboard", });
+    await signIn(provider, { redirectTo: callbackUrl || "/user-dashboard", });
 }
 
 export const logout = async () => {
