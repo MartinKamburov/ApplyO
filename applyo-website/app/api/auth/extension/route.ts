@@ -8,7 +8,7 @@ export async function GET(request: Request) {
 
   // 1. Security Check: Validate the extension ID
   // Replace this string with your actual Chrome Extension ID (e.g. "abcdefghijkl...")
-  const ALLOWED_EXTENSION_ID = "hgpodffepiapakapjkcacjckeaacmndf"; 
+  const ALLOWED_EXTENSION_ID = "gkkhgcedilipmplhkgminkhkahgoejaj"; 
   
   if (extensionId !== ALLOWED_EXTENSION_ID) {
     return NextResponse.json({ error: "Invalid Extension ID" }, { status: 400 });
