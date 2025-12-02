@@ -6,11 +6,13 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const extensionId = searchParams.get("ext_id");
 
-  // 1. Security Check: Validate the extension ID
-  // Replace this string with your actual Chrome Extension ID (e.g. "abcdefghijkl...")
-  const ALLOWED_EXTENSION_ID = "gkkhgcedilipmplhkgminkhkahgoejaj"; 
+  // 1. Security Check: Validate against an ALLOWED LIST
+  const ALLOWED_IDS = [
+    "gkkhgcedilipmplhkgminkhkahgoejaj",
+    "hgpodffepiapakapjkcacjckeaacmndf"
+  ];
   
-  if (extensionId !== ALLOWED_EXTENSION_ID) {
+  if (!extensionId || !ALLOWED_IDS.includes(extensionId)) {
     return NextResponse.json({ error: "Invalid Extension ID" }, { status: 400 });
   }
 
